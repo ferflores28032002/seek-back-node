@@ -17,7 +17,7 @@ import "./services/BrevoService";
     databaseUrl: DATABASE_URL,
     dialect: "postgres",
     logging: true,
-    modelsPath: path.join(__dirname, "models/index.ts"),
+    modelsPath: path.join(__dirname, "models/index.js"),
   };
 
   const isConnected = await DatabaseConnectionManager.initialize(
