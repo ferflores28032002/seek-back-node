@@ -33,6 +33,14 @@ export const createUser = async (req: Request, res: Response) => {
 
     const { email, password, name, status, isVerified } = dto;
 
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      res.status(400).json({
+        message: `El correo electrónico '${email}' ya está registrado. Por favor, utiliza otro.`,
+      });
+      return;
+    }
+
     const hashedPassword = BcryptAdapter.hash(password);
 
     const user = await User.create({
@@ -45,7 +53,7 @@ export const createUser = async (req: Request, res: Response) => {
 
     const token = await JwtAdapter.generateToken(
       { id: user.id, email: user.email },
-      "5h"
+      "10h"
     );
 
     await emailService.sendEmail({
@@ -148,12 +156,17 @@ export const login = async (req: Request, res: Response) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "Usuario no encontrado" });
       return;
     }
 
     if (!user.isVerified) {
-      res.status(401).json({ message: "User is not verified" });
+      res
+        .status(401)
+        .json({
+          message:
+            "El usuario no está verificado. Por favor, revise su correo electrónico para completar la verificación.",
+        });
       return;
     }
 
@@ -166,7 +179,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = await JwtAdapter.generateToken(
       { id: user.id, email: user.email },
-      "5h"
+      "10h"
     );
 
     if (!token) {
