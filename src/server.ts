@@ -1,8 +1,10 @@
+import express, { Application, Request, Response } from "express";
+import swaggerUi from "swagger-ui-express";
 import cors from "cors";
 
-import express, { Application, Request, Response } from "express";
-
 import { taskRouter, taskStatusRouter, userRouter } from "./routes";
+
+import swaggerDocument from "../swaggerDocument.json";
 
 class Server {
   private app: Application;
@@ -22,9 +24,9 @@ class Server {
 
   private routes() {
     this.app.get("/", (req: Request, res: Response) => {
-      res.send("¡Hello world!");
+      res.send("Welcome to the API! Visit /api-docs for Swagger documentation.");
     });
-
+    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     this.app.use("/api/v1/users", userRouter);
     this.app.use("/api/v1/task", taskRouter);
     this.app.use("/api/v1/status", taskStatusRouter);

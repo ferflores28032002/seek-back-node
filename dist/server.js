@@ -3,9 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const cors_1 = __importDefault(require("cors"));
 const routes_1 = require("./routes");
+const swaggerDocument_json_1 = __importDefault(require("../swaggerDocument.json"));
 class Server {
     constructor(port) {
         this.app = (0, express_1.default)();
@@ -19,8 +21,9 @@ class Server {
     }
     routes() {
         this.app.get("/", (req, res) => {
-            res.send("¡Hello world!");
+            res.send("Welcome to the API! Visit /api-docs for Swagger documentation.");
         });
+        this.app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument_json_1.default));
         this.app.use("/api/v1/users", routes_1.userRouter);
         this.app.use("/api/v1/task", routes_1.taskRouter);
         this.app.use("/api/v1/status", routes_1.taskStatusRouter);

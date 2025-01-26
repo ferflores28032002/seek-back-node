@@ -1,0 +1,448 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Documentation Seek Task",
+    "version": "1.0.0",
+    "description": "API for managing users, tasks, and statuses with authentication"
+  },
+  "servers": [
+    {
+      "url": "https://seek-back-node-production.up.railway.app/api/v1",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "CreateUserDTO": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "The user's email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "The user's password"
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "The user's full name"
+          },
+          "status": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indicates if the user is active"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": false,
+            "description": "Indicates if the user is verified"
+          }
+        },
+        "required": ["email", "password", "name"]
+      },
+      "LoginDTO": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "The user's email address"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123",
+            "description": "The user's password"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "TokenDTO": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "description": "JWT token"
+          }
+        },
+        "required": ["token"]
+      },
+      "CreateTaskDTO": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "New Task",
+            "description": "The title of the task"
+          },
+          "description": {
+            "type": "string",
+            "example": "Description of the task",
+            "description": "Details about the task"
+          },
+          "statusId": {
+            "type": "integer",
+            "example": 1,
+            "description": "The ID of the task's status"
+          }
+        },
+        "required": ["title", "description", "statusId"]
+      },
+      "CreateTaskStatusDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "In Progress",
+            "description": "The name of the status"
+          },
+          "description": {
+            "type": "string",
+            "example": "This status is for tasks in progress",
+            "description": "Details about the status"
+          },
+          "color": {
+            "type": "string",
+            "example": "#ffcc00",
+            "description": "The color associated with this status"
+          }
+        },
+        "required": ["name", "description", "color"]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "summary": "Create a new user",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Validation error or duplicate email"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all users (paginated)",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "List of users"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of the user"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a user",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The ID of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/users/verify/{token}": {
+      "post": {
+        "summary": "Verify a user's account",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The verification token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User verified successfully"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Log in a user",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful with JWT token"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/users/forgot-password": {
+      "post": {
+        "summary": "Request a password reset",
+        "tags": ["Users"],
+        "description": "Sends a password reset link to the user's email address.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "user@example.com",
+                    "description": "The email address associated with the user's account."
+                  }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset email sent successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "400": {
+            "description": "Validation error (e.g., invalid email format)"
+          }
+        }
+      }
+    },
+    "/users/update-password": {
+      "post": {
+        "summary": "Update a user's password",
+        "tags": ["Users"],
+        "description": "Allows a user to reset their password using a valid token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "description": "The token received in the password reset email."
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "example": "newpassword123",
+                    "description": "The new password for the user (minimum 8 characters)."
+                  }
+                },
+                "required": ["token", "newPassword"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully"
+          },
+          "400": {
+            "description": "Invalid or expired token, or validation error"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/task": {
+      "get": {
+        "summary": "Get all tasks",
+        "tags": ["Tasks"],
+        "responses": {
+          "200": {
+            "description": "List of tasks"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a task",
+        "tags": ["Tasks"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created successfully"
+          }
+        }
+      }
+    },
+    "/task/{id}": {
+      "get": {
+        "summary": "Get a task by ID",
+        "tags": ["Tasks"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Task ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task details"
+          },
+          "404": {
+            "description": "Task not found"
+          }
+        }
+      }
+    },
+    "/status": {
+      "post": {
+        "summary": "Create a new status",
+        "tags": ["Statuses"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskStatusDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Status created successfully"
+          }
+        }
+      }
+    }
+  }
+}

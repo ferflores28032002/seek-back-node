@@ -19,6 +19,13 @@ const createUser = async (req, res) => {
         Object.assign(dto, req.body);
         await (0, class_validator_1.validateOrReject)(dto);
         const { email, password, name, status, isVerified } = dto;
+        const existingUser = await user_2.default.findOne({ where: { email } });
+        if (existingUser) {
+            res.status(400).json({
+                message: `El correo electrónico '${email}' ya está registrado. Por favor, utiliza otro.`,
+            });
+            return;
+        }
         const hashedPassword = config_1.BcryptAdapter.hash(password);
         const user = await user_2.default.create({
             email,
@@ -27,7 +34,7 @@ const createUser = async (req, res) => {
             status,
             isVerified,
         });
-        const token = await jwt_1.JwtAdapter.generateToken({ id: user.id, email: user.email }, "5h");
+        const token = await jwt_1.JwtAdapter.generateToken({ id: user.id, email: user.email }, "10h");
         await emailService.sendEmail({
             recipient: { name, email },
             subject: "Bienvenido a la plataforma",
@@ -120,11 +127,15 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         const user = await user_2.default.findOne({ where: { email } });
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({ message: "Usuario no encontrado" });
             return;
         }
         if (!user.isVerified) {
-            res.status(401).json({ message: "User is not verified" });
+            res
+                .status(401)
+                .json({
+                message: "El usuario no está verificado. Por favor, revise su correo electrónico para completar la verificación.",
+            });
             return;
         }
         const isValidPassword = config_1.BcryptAdapter.compare(password, user.password);
@@ -132,7 +143,7 @@ const login = async (req, res) => {
             res.status(401).json({ message: "Invalid credentials" });
             return;
         }
-        const token = await jwt_1.JwtAdapter.generateToken({ id: user.id, email: user.email }, "5h");
+        const token = await jwt_1.JwtAdapter.generateToken({ id: user.id, email: user.email }, "10h");
         if (!token) {
             res
                 .status(500)

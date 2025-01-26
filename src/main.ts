@@ -3,12 +3,11 @@ import path from "path";
 import Server from "./server";
 
 import { envs } from "./config";
+
 import {
   ConnectionOptions,
   DatabaseConnectionManager,
 } from "./database/Connection";
-
-import "./services/BrevoService";
 
 (async () => {
   const DATABASE_URL = `postgres://${envs.POSTGRES_USER}:${envs.POSTGRES_PASSWORD}@${envs.POSTGRES_HOST}:${envs.POSTGRES_PORT}/${envs.POSTGRES_DATABASE}`;
@@ -17,7 +16,7 @@ import "./services/BrevoService";
     databaseUrl: DATABASE_URL,
     dialect: "postgres",
     logging: true,
-    modelsPath: path.join(__dirname, "models/index.js"),
+    modelsPath: path.join(__dirname, "models/index.ts"),
   };
 
   const isConnected = await DatabaseConnectionManager.initialize(
