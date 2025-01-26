@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { validateOrReject } from "class-validator";
 
 import { CreateTaskStatusDto } from "../dto/TaskStatus/CreateTaskStatusDto";
+import CustomError from "../error/customError";
+
 import TaskStatus from "../models/TaskStatus";
 
 export const createTaskStatus = async (req: Request, res: Response) => {
@@ -12,12 +14,20 @@ export const createTaskStatus = async (req: Request, res: Response) => {
     await validateOrReject(dto);
 
     const { name, description, color } = dto;
+
+    const duplicateTaskStatus = await TaskStatus.findOne({ where: { name } });
+
+    if (duplicateTaskStatus) {
+      res.status(400).json({ message: "Task status already exists" });
+      return;
+    }
+
     const taskStatus = await TaskStatus.create({ name, description, color });
     res
       .status(201)
       .json({ message: "Task status created successfully", taskStatus });
   } catch (error) {
-    res.status(400).json({ errors: error });
+    throw CustomError.InternalServerError();
   }
 };
 
@@ -26,9 +36,7 @@ export const getTaskStatuses = async (_req: Request, res: Response) => {
     const taskStatuses = await TaskStatus.findAll();
     res.status(200).json(taskStatuses);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "An error occurred while fetching task statuses" });
+    throw CustomError.InternalServerError();
   }
 };
 
@@ -49,7 +57,7 @@ export const updateTaskStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "Task status updated successfully", taskStatus });
   } catch (error) {
-    res.status(400).json({ errors: error });
+    throw CustomError.InternalServerError();
   }
 };
 
@@ -66,8 +74,6 @@ export const deleteTaskStatus = async (req: Request, res: Response) => {
     await taskStatus.destroy();
     res.status(200).json({ message: "Task status deleted successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "An error occurred while deleting the task status" });
+    throw CustomError.InternalServerError();
   }
 };

@@ -17,3 +17,4 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./CreateUserDto"), exports);
 __exportStar(require("./ForgotPasswordDto"), exports);
 __exportStar(require("./UpdatePasswordDto"), exports);
+__exportStar(require("./UpdateUserDto"), exports);

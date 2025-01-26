@@ -8,7 +8,7 @@ import {
 
 import { Validators } from "../../config";
 
-export class CreateUserDTO {
+export class CreateUserDto {
   @Matches(Validators.email, { message: "The email format is invalid." })
   email!: string;
 

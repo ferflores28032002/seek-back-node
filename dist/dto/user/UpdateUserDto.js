@@ -9,37 +9,40 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUserDto = void 0;
+exports.UpdateUserDto = void 0;
 const class_validator_1 = require("class-validator");
 const config_1 = require("../../config");
-class CreateUserDto {
+class UpdateUserDto {
 }
-exports.CreateUserDto = CreateUserDto;
+exports.UpdateUserDto = UpdateUserDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.Matches)(config_1.Validators.email, { message: "The email format is invalid." }),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "email", void 0);
+], UpdateUserDto.prototype, "email", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.Length)(8, 100, {
         message: "The password must be between 8 and 100 characters long.",
     }),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "password", void 0);
+], UpdateUserDto.prototype, "password", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.Length)(3, 50, {
         message: "The name must be between 3 and 50 characters long.",
     }),
     __metadata("design:type", String)
-], CreateUserDto.prototype, "name", void 0);
+], UpdateUserDto.prototype, "name", void 0);
 __decorate([
-    (0, class_validator_1.IsBoolean)(),
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], CreateUserDto.prototype, "status", void 0);
+], UpdateUserDto.prototype, "status", void 0);
 __decorate([
-    (0, class_validator_1.IsBoolean)(),
     (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
-], CreateUserDto.prototype, "isVerified", void 0);
+], UpdateUserDto.prototype, "isVerified", void 0);

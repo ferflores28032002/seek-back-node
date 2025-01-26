@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTaskStatus = exports.updateTaskStatus = exports.getTaskStatuses = exports.createTaskStatus = void 0;
 const class_validator_1 = require("class-validator");
 const CreateTaskStatusDto_1 = require("../dto/TaskStatus/CreateTaskStatusDto");
+const customError_1 = __importDefault(require("../error/customError"));
 const TaskStatus_1 = __importDefault(require("../models/TaskStatus"));
 const createTaskStatus = async (req, res) => {
     try {
@@ -13,13 +14,18 @@ const createTaskStatus = async (req, res) => {
         Object.assign(dto, req.body);
         await (0, class_validator_1.validateOrReject)(dto);
         const { name, description, color } = dto;
+        const duplicateTaskStatus = await TaskStatus_1.default.findOne({ where: { name } });
+        if (duplicateTaskStatus) {
+            res.status(400).json({ message: "Task status already exists" });
+            return;
+        }
         const taskStatus = await TaskStatus_1.default.create({ name, description, color });
         res
             .status(201)
             .json({ message: "Task status created successfully", taskStatus });
     }
     catch (error) {
-        res.status(400).json({ errors: error });
+        throw customError_1.default.InternalServerError();
     }
 };
 exports.createTaskStatus = createTaskStatus;
@@ -29,9 +35,7 @@ const getTaskStatuses = async (_req, res) => {
         res.status(200).json(taskStatuses);
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ message: "An error occurred while fetching task statuses" });
+        throw customError_1.default.InternalServerError();
     }
 };
 exports.getTaskStatuses = getTaskStatuses;
@@ -50,7 +54,7 @@ const updateTaskStatus = async (req, res) => {
             .json({ message: "Task status updated successfully", taskStatus });
     }
     catch (error) {
-        res.status(400).json({ errors: error });
+        throw customError_1.default.InternalServerError();
     }
 };
 exports.updateTaskStatus = updateTaskStatus;
@@ -66,9 +70,7 @@ const deleteTaskStatus = async (req, res) => {
         res.status(200).json({ message: "Task status deleted successfully" });
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ message: "An error occurred while deleting the task status" });
+        throw customError_1.default.InternalServerError();
     }
 };
 exports.deleteTaskStatus = deleteTaskStatus;

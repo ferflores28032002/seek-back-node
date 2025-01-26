@@ -19,9 +19,7 @@ import {
     modelsPath: path.join(__dirname, "models/index.js"),
   };
 
-  const isConnected = await DatabaseConnectionManager.initialize(
-    connectionOptions
-  );
+  const isConnected = await DatabaseConnectionManager.initialize(connectionOptions);
 
   if (isConnected) {
     const sequelize = DatabaseConnectionManager.getInstance();
