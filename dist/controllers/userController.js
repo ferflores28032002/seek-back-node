@@ -215,18 +215,18 @@ const updatePassword = async (req, res) => {
         const { token, newPassword } = dto;
         const decoded = await jwt_1.JwtAdapter.validateToken(token);
         if (!decoded || !decoded.id) {
-            res.status(400).json({ message: "Invalid or expired token" });
+            res.status(400).json({ message: "Token inválido o expirado." });
             return;
         }
         const user = await user_2.default.findByPk(decoded.id);
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({ message: "Usuario no encontrado" });
             return;
         }
         const hashedPassword = config_1.BcryptAdapter.hash(newPassword);
         user.password = hashedPassword;
         await user.save();
-        res.status(200).json({ message: "Password updated successfully" });
+        res.status(200).json({ message: "Password actualizada con exito" });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();

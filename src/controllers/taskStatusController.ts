@@ -18,14 +18,14 @@ export const createTaskStatus = async (req: Request, res: Response) => {
     const duplicateTaskStatus = await TaskStatus.findOne({ where: { name } });
 
     if (duplicateTaskStatus) {
-      res.status(400).json({ message: "Task status already exists" });
+      res.status(400).json({ message: "El estatus de la tarea ya existe" });
       return;
     }
 
     const taskStatus = await TaskStatus.create({ name, description, color });
     res
       .status(201)
-      .json({ message: "Task status created successfully", taskStatus });
+      .json({ message: "El estatus de la tarea creado con exito", taskStatus });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -46,7 +46,7 @@ export const updateTaskStatus = async (req: Request, res: Response) => {
     const taskStatus = await TaskStatus.findByPk(id);
 
     if (!taskStatus) {
-      res.status(404).json({ message: "Task status not found" });
+      res.status(404).json({ message: "Tarea no encontrada" });
       return;
     }
 
@@ -55,7 +55,7 @@ export const updateTaskStatus = async (req: Request, res: Response) => {
 
     res
       .status(200)
-      .json({ message: "Task status updated successfully", taskStatus });
+      .json({ message: "Tarea actualizada con exito", taskStatus });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -67,12 +67,12 @@ export const deleteTaskStatus = async (req: Request, res: Response) => {
     const taskStatus = await TaskStatus.findByPk(id);
 
     if (!taskStatus) {
-      res.status(404).json({ message: "Task status not found" });
+      res.status(404).json({ message: "Tarea no encontrada" });
       return;
     }
 
     await taskStatus.destroy();
-    res.status(200).json({ message: "Task status deleted successfully" });
+    res.status(200).json({ message: "Tarea eliminada con exito" });
   } catch (error) {
     throw CustomError.InternalServerError();
   }

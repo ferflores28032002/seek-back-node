@@ -277,13 +277,13 @@ export const updatePassword = async (req: Request, res: Response) => {
     }>(token);
 
     if (!decoded || !decoded.id) {
-      res.status(400).json({ message: "Invalid or expired token" });
+      res.status(400).json({ message: "Token inválido o expirado." });
       return;
     }
 
     const user = await User.findByPk(decoded.id);
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "Usuario no encontrado" });
       return;
     }
     const hashedPassword = BcryptAdapter.hash(newPassword);
@@ -291,7 +291,7 @@ export const updatePassword = async (req: Request, res: Response) => {
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: "Password updated successfully" });
+    res.status(200).json({ message: "Password actualizada con exito" });
   } catch (error) {
     throw CustomError.InternalServerError();
   }

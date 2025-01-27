@@ -63,6 +63,10 @@ export const getTasks = async (_req: Request, res: Response) => {
     const tasks = await Task.findAll({
       where: { createdBy: userId },
       include: [TaskStatus, User],
+      order: [
+        ['updatedAt', 'DESC'], // Prioriza tareas actualizadas más recientemente
+        ['createdAt', 'DESC'], // En caso de empate, prioriza las tareas más recientes
+      ],
     });
     res.status(200).json(tasks);
   } catch (error) {
