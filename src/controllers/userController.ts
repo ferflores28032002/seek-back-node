@@ -101,7 +101,7 @@ export const getUserById = async (req: Request, res: Response) => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "Usuario no encontrado" });
       return;
     }
 
@@ -117,7 +117,7 @@ export const updateUser = async (req: Request, res: Response) => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "Usuario no encontrado" });
       return;
     }
 
@@ -127,7 +127,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
     await user.update(dto);
 
-    res.status(200).json({ message: "User updated successfully", user });
+    res.status(200).json({ message: "Usuario actualizado correctamente", user });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -139,12 +139,12 @@ export const deleteUser = async (req: Request, res: Response) => {
     const user = await User.findByPk(id);
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "Usuario no encontrado" });
       return;
     }
 
     await user.destroy();
-    res.status(200).json({ message: "User deleted successfully" });
+    res.status(200).json({ message: "Usuario eliminado correctamente" });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -171,7 +171,7 @@ export const login = async (req: Request, res: Response) => {
     const isValidPassword = BcryptAdapter.compare(password, user.password);
 
     if (!isValidPassword) {
-      res.status(401).json({ message: "Invalid credentials" });
+      res.status(401).json({ message: "Credenciales Incorrectas." });
       return;
     }
 
@@ -183,7 +183,7 @@ export const login = async (req: Request, res: Response) => {
     if (!token) {
       res
         .status(500)
-        .json({ message: "An error occurred while generating token" });
+        .json({ message: "Error al generar el token de autenticación" });
       return;
     }
 
@@ -203,20 +203,24 @@ export const verifyUser = async (req: Request, res: Response) => {
     }>(token);
 
     if (!decoded) {
-      res.status(401).json({ message: "Invalid token" });
+      res.status(401).json({ message: "Token inválido o expirado." });
       return;
     }
 
     const user = await User.findByPk(decoded.id);
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({
+        message: "Usuario no encontrado. Por favor, regístrate nuevamente.",
+       });
       return;
     }
 
     await user.update({ isVerified: true });
 
-    res.status(200).json({ message: "User verified successfully" });
+    res.status(200).json({ 
+      message: "Tu cuenta ha sido verificada exitosamente. Ahora puedes iniciar sesión."
+    });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -234,7 +238,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "Usuario no encontrado." });
       return;
     }
 
@@ -252,7 +256,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       }),
     });
 
-    res.status(200).json({ message: "Password reset email sent successfully" });
+    res.status(200).json({ message: "Se ha enviado un correo electrónico para restablecer tu contraseña."});
   } catch (error) {
     throw CustomError.InternalServerError();
   }

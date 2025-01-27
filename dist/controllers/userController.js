@@ -76,7 +76,7 @@ const getUserById = async (req, res) => {
         const { id } = req.params;
         const user = await user_2.default.findByPk(id);
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({ message: "Usuario no encontrado" });
             return;
         }
         res.status(200).json(user);
@@ -91,14 +91,14 @@ const updateUser = async (req, res) => {
         const { id } = req.params;
         const user = await user_2.default.findByPk(id);
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({ message: "Usuario no encontrado" });
             return;
         }
         const dto = new user_1.UpdateUserDto();
         Object.assign(dto, req.body);
         await (0, class_validator_1.validateOrReject)(dto);
         await user.update(dto);
-        res.status(200).json({ message: "User updated successfully", user });
+        res.status(200).json({ message: "Usuario actualizado correctamente", user });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();
@@ -110,11 +110,11 @@ const deleteUser = async (req, res) => {
         const { id } = req.params;
         const user = await user_2.default.findByPk(id);
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({ message: "Usuario no encontrado" });
             return;
         }
         await user.destroy();
-        res.status(200).json({ message: "User deleted successfully" });
+        res.status(200).json({ message: "Usuario eliminado correctamente" });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();
@@ -137,14 +137,14 @@ const login = async (req, res) => {
         }
         const isValidPassword = config_1.BcryptAdapter.compare(password, user.password);
         if (!isValidPassword) {
-            res.status(401).json({ message: "Invalid credentials" });
+            res.status(401).json({ message: "Credenciales Incorrectas." });
             return;
         }
         const token = await jwt_1.JwtAdapter.generateToken({ id: user.id, email: user.email }, "10h");
         if (!token) {
             res
                 .status(500)
-                .json({ message: "An error occurred while generating token" });
+                .json({ message: "Error al generar el token de autenticación" });
             return;
         }
         res.status(200).json({ token, user });
@@ -159,16 +159,20 @@ const verifyUser = async (req, res) => {
         const { token } = req.params;
         const decoded = await jwt_1.JwtAdapter.validateToken(token);
         if (!decoded) {
-            res.status(401).json({ message: "Invalid token" });
+            res.status(401).json({ message: "Token inválido o expirado." });
             return;
         }
         const user = await user_2.default.findByPk(decoded.id);
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({
+                message: "Usuario no encontrado. Por favor, regístrate nuevamente.",
+            });
             return;
         }
         await user.update({ isVerified: true });
-        res.status(200).json({ message: "User verified successfully" });
+        res.status(200).json({
+            message: "Tu cuenta ha sido verificada exitosamente. Ahora puedes iniciar sesión."
+        });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();
@@ -184,7 +188,7 @@ const forgotPassword = async (req, res) => {
         const { email } = dto;
         const user = await user_2.default.findOne({ where: { email } });
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            res.status(404).json({ message: "Usuario no encontrado." });
             return;
         }
         const token = await jwt_1.JwtAdapter.generateToken({ id: user.id, email: user.email }, "10h");
@@ -196,7 +200,7 @@ const forgotPassword = async (req, res) => {
                 resetLink: `${config_1.envs.FORGOT_PASSWORD_URL}?token=${token}`,
             }),
         });
-        res.status(200).json({ message: "Password reset email sent successfully" });
+        res.status(200).json({ message: "Se ha enviado un correo electrónico para restablecer tu contraseña." });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();

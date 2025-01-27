@@ -13,7 +13,7 @@ const Connection_1 = require("./database/Connection");
         databaseUrl: DATABASE_URL,
         dialect: "postgres",
         logging: true,
-        modelsPath: path_1.default.join(__dirname, "models/index.js"),
+        modelsPath: path_1.default.join(__dirname, "models/index.js"), // cambiar a index.ts en desarrollo
     };
     const isConnected = await Connection_1.DatabaseConnectionManager.initialize(connectionOptions);
     if (isConnected) {

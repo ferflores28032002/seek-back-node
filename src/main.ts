@@ -16,10 +16,12 @@ import {
     databaseUrl: DATABASE_URL,
     dialect: "postgres",
     logging: true,
-    modelsPath: path.join(__dirname, "models/index.js"),
+    modelsPath: path.join(__dirname, "models/index.js"), // cambiar a index.ts en desarrollo
   };
 
-  const isConnected = await DatabaseConnectionManager.initialize(connectionOptions);
+  const isConnected = await DatabaseConnectionManager.initialize(
+    connectionOptions
+  );
 
   if (isConnected) {
     const sequelize = DatabaseConnectionManager.getInstance();

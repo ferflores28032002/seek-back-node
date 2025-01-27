@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Op } from "sequelize";
 
 import { validateOrReject } from "class-validator";
 
@@ -45,7 +46,7 @@ export const createTask = async (req: Request, res: Response) => {
       createdBy: userId,
     });
 
-    res.status(201).json({ message: "Task created successfully", task });
+    res.status(201).json({ message: "Tarea creada con exito", task });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -75,7 +76,7 @@ export const updateTask = async (req: Request, res: Response) => {
     const task = await Task.findByPk(id);
 
     if (!task) {
-      res.status(404).json({ message: "Task not found" });
+      res.status(404).json({ message: "Tarea no encontrada"});
       return;
     }
 
@@ -83,7 +84,12 @@ export const updateTask = async (req: Request, res: Response) => {
     Object.assign(dto, req.body);
     await validateOrReject(dto);
 
-    const duplicateTask = await Task.findOne({ where: { title: dto.title } });
+    const duplicateTask = await Task.findOne({
+      where: {
+        title: dto.title,
+        id: { [Op.ne]: id }, // Exclude the current task
+      },
+    });
 
     if (duplicateTask) {
       res.status(404).json({ message: "La tarea ya existe!" });
@@ -93,7 +99,7 @@ export const updateTask = async (req: Request, res: Response) => {
     Object.assign(task, req.body);
     await task.save();
 
-    res.status(200).json({ message: "Task updated successfully", task });
+    res.status(200).json({ message: "Tarea actualizada con exito", task });
   } catch (error) {
     throw CustomError.InternalServerError();
   }
@@ -105,12 +111,12 @@ export const deleteTask = async (req: Request, res: Response) => {
     const task = await Task.findByPk(id);
 
     if (!task) {
-      res.status(404).json({ message: "Task not found" });
+      res.status(404).json({ message: "Tarea no encontrada" });
       return;
     }
 
     await task.destroy();
-    res.status(200).json({ message: "Task deleted successfully" });
+    res.status(200).json({  message: 'Tarea eliminada correctamente'});
   } catch (error) {
     throw CustomError.InternalServerError();
   }

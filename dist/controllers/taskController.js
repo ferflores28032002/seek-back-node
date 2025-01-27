@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTask = exports.updateTask = exports.getTasks = exports.createTask = void 0;
+const sequelize_1 = require("sequelize");
 const class_validator_1 = require("class-validator");
 const CreateTaskDto_1 = require("../dto/Task/CreateTaskDto");
 const UpdateTaskDto_1 = require("../dto/Task/UpdateTaskDto");
@@ -38,7 +39,7 @@ const createTask = async (req, res) => {
             statusId,
             createdBy: userId,
         });
-        res.status(201).json({ message: "Task created successfully", task });
+        res.status(201).json({ message: "Tarea creada con exito", task });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();
@@ -68,20 +69,25 @@ const updateTask = async (req, res) => {
         const { id } = req.params;
         const task = await task_1.default.findByPk(id);
         if (!task) {
-            res.status(404).json({ message: "Task not found" });
+            res.status(404).json({ message: "Tarea no encontrada" });
             return;
         }
         const dto = new UpdateTaskDto_1.UpdateTaskDto();
         Object.assign(dto, req.body);
         await (0, class_validator_1.validateOrReject)(dto);
-        const duplicateTask = await task_1.default.findOne({ where: { title: dto.title } });
+        const duplicateTask = await task_1.default.findOne({
+            where: {
+                title: dto.title,
+                id: { [sequelize_1.Op.ne]: id }, // Exclude the current task
+            },
+        });
         if (duplicateTask) {
             res.status(404).json({ message: "La tarea ya existe!" });
             return;
         }
         Object.assign(task, req.body);
         await task.save();
-        res.status(200).json({ message: "Task updated successfully", task });
+        res.status(200).json({ message: "Tarea actualizada con exito", task });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();
@@ -93,11 +99,11 @@ const deleteTask = async (req, res) => {
         const { id } = req.params;
         const task = await task_1.default.findByPk(id);
         if (!task) {
-            res.status(404).json({ message: "Task not found" });
+            res.status(404).json({ message: "Tarea no encontrada" });
             return;
         }
         await task.destroy();
-        res.status(200).json({ message: "Task deleted successfully" });
+        res.status(200).json({ message: 'Tarea eliminada correctamente' });
     }
     catch (error) {
         throw customError_1.default.InternalServerError();
